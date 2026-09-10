@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  body {
+    @apply bg-white font-sans text-ink antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: #2e7a3b;
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid #2e7a3b;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-site px-5 sm:px-8;
+  }
+
+  /* ── Type ──────────────────────────────────────────────────────────── */
+  /* Section heading: light geometric, brand green — the corporate register. */
+  .h-section {
+    @apply font-display text-3xl font-normal leading-[1.15] tracking-tight text-green-700 md:text-[2.5rem];
+  }
+  .h-section-dark {
+    @apply font-display text-3xl font-normal leading-[1.15] tracking-tight text-white md:text-[2.5rem];
+  }
+  /* Page title inside a page header band. */
+  .h-page {
+    @apply font-display text-4xl font-medium leading-[1.08] tracking-tight text-white md:text-5xl lg:text-[3.5rem];
+  }
+  .lede {
+    @apply text-lg leading-relaxed text-ink-soft;
+  }
+  /* Small caps label above a heading — sans, quiet, never mono. */
+  .kicker {
+    @apply text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-green-700;
+  }
+
+  /* ── Buttons: pills ────────────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[0.95rem] font-semibold transition-colors duration-200;
+  }
+  .btn-primary {
+    @apply btn bg-green-700 text-white hover:bg-green-800;
+  }
+  .btn-secondary {
+    @apply btn border border-green-700 bg-white text-green-700 hover:bg-green-50;
+  }
+  .btn-outline {
+    @apply btn border border-line-strong bg-white text-ink hover:border-ink/40 hover:bg-paper;
+  }
+  /* On navy or green panels */
+  .btn-light {
+    @apply btn bg-white text-green-800 hover:bg-green-50;
+  }
+  .btn-ghost-light {
+    @apply btn border border-white/40 bg-transparent text-white hover:bg-white/10;
+  }
+  /* Kept for the suite pages, which still use it. */
+  .btn-dark {
+    @apply btn bg-navy text-white hover:bg-navy-800;
+  }
+
+  /* ── Surfaces ──────────────────────────────────────────────────────── */
+  .card {
+    @apply rounded-xl border border-line bg-white shadow-card;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:border-green-300 hover:shadow-lift;
+  }
+  /* Rounded image or image-slot, the reference's 20px corners. */
+  .img-frame {
+    @apply overflow-hidden rounded-2xl;
+  }
+
+  /* Text link with a small arrow */
+  .link-arrow {
+    @apply inline-flex items-center gap-1.5 font-semibold text-green-700 transition-colors hover:text-green-800;
+  }
+
+  /* Tick list */
+  .tick-list {
+    @apply space-y-2.5;
+  }
+  .tick-list li {
+    @apply flex items-start gap-3 text-[1.02rem] leading-relaxed text-ink-soft;
+  }
+
+  /* Form fields */
+  .field {
+    @apply w-full rounded-lg border border-line-strong bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-green-600 focus:ring-2 focus:ring-green-600/20;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-ink;
+  }
+
+  /* Legacy names still used by the suite pages (kept so nothing breaks). */
+  .spec {
+    @apply text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-ink-faint;
+  }
+  .eyebrow {
+    @apply kicker inline-flex w-fit items-center gap-2;
+  }
+
+  /* ── Long-form legal / prose content ──────────────────────────────── */
+  .prose-legal {
+    @apply text-[0.98rem] leading-relaxed text-ink-soft;
+  }
+  .prose-legal h2 {
+    @apply mb-3 mt-10 font-display text-2xl font-medium text-ink first:mt-0;
+  }
+  .prose-legal h3 {
+    @apply mb-2 mt-6 font-display text-lg font-medium text-ink;
+  }
+  .prose-legal p {
+    @apply my-3;
+  }
+  .prose-legal ul {
+    @apply my-3 list-disc space-y-1.5 pl-5;
+  }
+  .prose-legal a {
+    @apply font-medium text-green-700 underline underline-offset-2 hover:text-green-800;
+  }
+  .prose-legal strong {
+    @apply font-semibold text-ink;
+  }
+  .prose-legal button {
+    @apply no-underline;
+  }
+  .prose-legal table {
+    @apply my-5 w-full border-collapse text-sm;
+  }
+  .prose-legal th {
+    @apply border border-line bg-paper px-3 py-2 text-left align-top font-semibold text-ink [overflow-wrap:anywhere];
+  }
+  .prose-legal td {
+    @apply border border-line px-3 py-2 align-top [overflow-wrap:anywhere];
+  }
+}
+
+@layer utilities {
+  /* A soft brand gradient for panels that would carry a photograph once one
+     is supplied: deep navy into forest green, lit from the top-left. */
+  .bg-brand-panel {
+    background-color: #0d1b2a;
+    background-image:
+      radial-gradient(120% 90% at 0% 0%, rgba(76, 175, 80, 0.38) 0%, rgba(76, 175, 80, 0) 55%),
+      radial-gradient(90% 80% at 100% 100%, rgba(139, 195, 74, 0.22) 0%, rgba(139, 195, 74, 0) 60%),
+      linear-gradient(160deg, #0f2233 0%, #0d1b2a 45%, #12321f 100%);
+  }
+  /* The light panel an ImageSlot shows until a photograph is supplied. */
+  .bg-image-slot {
+    background-color: #eef6ef;
+    background-image:
+      radial-gradient(90% 80% at 100% 0%, rgba(139, 195, 74, 0.28) 0%, rgba(139, 195, 74, 0) 60%),
+      radial-gradient(80% 70% at 0% 100%, rgba(46, 122, 59, 0.16) 0%, rgba(46, 122, 59, 0) 60%);
+  }
+  .bg-green-panel {
+    background-color: #2e7a3b;
+    background-image:
+      radial-gradient(110% 90% at 100% 0%, rgba(139, 195, 74, 0.45) 0%, rgba(139, 195, 74, 0) 60%),
+      linear-gradient(160deg, #2e7a3b 0%, #245f2f 100%);
+  }
+  /* Faint drafting grid on navy — kept for the private suite pages only. */
+  .bg-blueprint {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* Dark overlay laid over a hero photograph so white text stays readable. */
+  .bg-photo-overlay {
+    background-image:
+      linear-gradient(90deg, rgba(10, 20, 31, 0.88) 0%, rgba(10, 20, 31, 0.7) 50%, rgba(10, 20, 31, 0.5) 100%),
+      linear-gradient(180deg, rgba(10, 20, 31, 0.2) 0%, rgba(10, 20, 31, 0) 40%, rgba(10, 20, 31, 0.35) 100%);
+  }
+}
