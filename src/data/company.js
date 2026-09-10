@@ -23,8 +23,35 @@ export const COMPANY = {
   registeredOffice: '49 Whitegate Drive, Blackpool, England, FY3 9DG',
 
   // Leave '' if not applicable:
-  vatNumber: '', // TODO e.g. 'GB123456789' if VAT registered
-  icoNumber: '', // TODO ICO data-protection register reference (see note in Privacy page)
+  // Not VAT registered. Leave '' — an invoice or a page must never show or
+  // charge VAT while this is empty.
+  vatNumber: '',
+
+  // ICO data protection register reference, e.g. 'ZB123456'.
+  //
+  // OUTSTANDING as of 10 Sep 2026: George is not registered. Under the Data
+  // Protection (Charges and Information) Regulations 2018 a controller that
+  // processes personal data must pay the annual fee unless every purpose it
+  // processes for is an exempt one. We hold customers' names, addresses and
+  // phone numbers, and lodge certificates on the national EPC register, so
+  // this needs settling either way:
+  //
+  //   1. Take the ICO's own assessment — it is the authoritative answer:
+  //      https://ico.org.uk/for-organisations/data-protection-fee/data-protection-fee-self-assessment/
+  //   2a. If it says pay: register at
+  //      https://ico.org.uk/for-organisations/data-protection-fee/register/
+  //      Tier 1 (micro organisation, under £632k turnover or 10 staff) is
+  //      £52 a year, £47 by direct debit. Then paste the reference here.
+  //   2b. If it says exempt: tell the ICO anyway, so their records show it
+  //      rather than showing an unregistered controller —
+  //      https://ico.org.uk/for-organisations/data-protection-fee/exemptions/exempt-data-protection-fee/
+  //      and leave this ''.
+  //
+  // Maximum penalty for processing without paying a fee that was due: £4,350.
+  // The Privacy page hides the registration line while this is blank, so
+  // nothing untrue is published in the meantime — but "not published" is not
+  // the same as "not required".
+  icoNumber: '',
 
   // Contact
   email: 'info@ecofutures.uk',
