@@ -111,7 +111,7 @@ const BOOK_WITHIN = 'within 24 hours'
 const LINK_WITHIN = 'within 2–24 hours of lodgement'
 
 const steps = [
-  ['Pay online', 'Choose your bedroom count and pay the full fee securely by card. Nothing else to pay later.'],
+  ['Pay online', 'Choose your bedroom count and pay the full fee securely by card. That is the whole EPC fee.'],
   [
     'Pick your dates',
     'As soon as you have paid, the next screen asks which dates suit you. It takes a few seconds and there is nothing else to fill in.',
@@ -445,8 +445,15 @@ export default function Book() {
 
       <ul className="mt-3 space-y-1.5 text-xs leading-relaxed text-ink-soft">
         {[
-          'This is the full amount. No deposit and nothing to pay afterwards.',
+          // Precise, not absolute. The Terms allow a fee for a SECOND wasted
+          // journey, so "nothing to pay afterwards" full stop was a claim the
+          // small print contradicted — which is Google's dishonest-pricing
+          // category, and the same shape of fault that got the ads flagged.
+          // Saying "no hidden extras" and disclosing the free rebook keeps the
+          // reassurance without the contradiction.
+          'This is the full amount for your EPC. No deposit and no hidden extras.',
           'The price depends only on the number of bedrooms. Nothing is added for distance inside our area.',
+          'If nobody is home when we arrive, we rebook once free of charge.',
           'If we cannot complete your EPC we refund you in full.',
         ].map((t) => (
           <li key={t} className="flex items-start gap-2">
@@ -535,7 +542,7 @@ export default function Book() {
           </>
         }
         intro={[
-          `£${EPC_BASE} covers a home with up to ${BEDROOMS_INCLUDED} bedrooms, then £${PER_EXTRA_BEDROOM} for each extra bedroom. A four-bedroom home is £${EPC_BASE + PER_EXTRA_BEDROOM} and a five-bedroom home is £${EPC_BASE + PER_EXTRA_BEDROOM * 2}. That is the whole price, with no deposit and nothing to pay afterwards.`,
+          `£${EPC_BASE} covers a home with up to ${BEDROOMS_INCLUDED} bedrooms, then £${PER_EXTRA_BEDROOM} for each extra bedroom. A four-bedroom home is £${EPC_BASE + PER_EXTRA_BEDROOM} and a five-bedroom home is £${EPC_BASE + PER_EXTRA_BEDROOM * 2}. That is the whole price for the EPC, with no deposit and no hidden extras.`,
           'An accredited domestic energy assessor visits your property, carries out the assessment and lodges your certificate on the national register.',
         ]}
         aside={orderCard}

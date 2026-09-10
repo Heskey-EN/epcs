@@ -113,9 +113,11 @@ export default function Terms() {
       <p>
         <strong>EPC fee.</strong> The EPC fee is paid in full online when you book — £
         {EPC_BASE_PRICE} for up to {EPC_BEDROOMS_INCLUDED} bedrooms, then £{EPC_PER_EXTRA_BEDROOM}{' '}
-        per additional bedroom, up to {EPC_MAX_BEDROOMS} bedrooms. There is no deposit and nothing
-        further to pay. If we are unable to carry out your EPC (for example your property is outside
-        our service area), we refund the fee in full.
+        per additional bedroom, up to {EPC_MAX_BEDROOMS} bedrooms. There is no deposit, and no
+        further charge for the assessment itself. If we are unable to carry out your EPC (for
+        example your property is outside our service area), we refund the fee in full. The one
+        situation in which a further charge can arise is a repeatedly missed visit — see{' '}
+        <em>Cancelling, rearranging or a missed visit</em> below.
       </p>
       <h2>Cancelling an EPC you booked online</h2>
       <p>

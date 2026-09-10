@@ -133,11 +133,55 @@ check(
 const priceBits = {
   'base price': /£65/,
   'per-extra-bedroom rule': /£5 (?:for|per) each extra bedroom|£5 per extra bedroom|£5 for each extra bedroom/i,
-  'no hidden cost statement': /no deposit and nothing to pay afterwards/i,
+  'no hidden cost statement': /no deposit and no hidden extras/i,
   'refund promise': /refund/i,
 }
 for (const [label, re] of Object.entries(priceBits)) {
   check(`Pricing: ${label}`, re.test(homeText), re.test(homeText) ? 'stated' : 'NOT FOUND', 'Misrepresentation — unclear pricing')
+}
+
+/* 8b. No ABSOLUTE no-further-cost claim, because the Terms permit a fee for a
+   repeatedly missed visit. An unqualified "nothing to pay afterwards" on the
+   landing page contradicted by a conditional charge in the small print is
+   exactly Google's dishonest-pricing category. Either the claim stays
+   qualified or the fee comes out of the Terms — not both. */
+const terms = read('terms/index.html') || ''
+const termsHasFee = /abortive-visit fee|further charge can arise/i.test(textOf(terms))
+const absoluteClaim = /nothing (?:to pay afterwards|further to pay|else to pay)/i.test(homeText)
+check(
+  'No absolute "nothing more to pay" claim',
+  !(absoluteClaim && termsHasFee),
+  absoluteClaim && termsHasFee
+    ? 'landing page promises no further cost while the Terms allow a missed-visit fee — CONTRADICTION'
+    : termsHasFee
+      ? 'Terms allow a missed-visit fee; the landing page claim is correctly qualified'
+      : 'no conditional fee in the Terms',
+  'Misrepresentation — dishonest pricing practices',
+)
+
+/* 8c. The one conditional charge that does exist must be disclosed on the
+   landing page too, not only in the linked Terms. */
+check(
+  'Missed-visit policy stated on the landing page',
+  /rebook once free of charge|rebook a missed visit/i.test(homeText),
+  /rebook once free of charge/i.test(homeText) ? 'free first rebook disclosed' : 'NOT DISCLOSED',
+  'Misrepresentation — dishonest pricing practices',
+)
+
+/* 8d. Ad-to-landing-page relevance. Google's "unclear relevance" rule wants
+   the promise in the ad honoured on the page it lands on. These are the live
+   headlines and callouts in the account — if one stops being true on the page,
+   the ad is making a claim the destination does not keep. Update this list
+   when the ad copy changes. */
+const adPromises = {
+  '"£65 Home EPC up to 3 Bedrooms"': /£65[\s\S]{0,80}up to 3 bedrooms/i,
+  '"Elmhurst Accredited Assessor"': /Elmhurst[\s\S]{0,40}accredited assessor/i,
+  '"Book Your EPC Online Today"': /Pay £\d+ and book|Order your EPC/i,
+  '"TrustMark Registered Business"': /TrustMark/i,
+  '"Preston & North West" coverage': /within 40 miles of Preston/i,
+}
+for (const [label, re] of Object.entries(adPromises)) {
+  check(`Ad promise honoured: ${label}`, re.test(homeText), re.test(homeText) ? 'on the page' : 'AD CLAIMS THIS, PAGE DOES NOT', 'Misrepresentation — unclear relevance')
 }
 
 /* 9. Substantiated claims. Accreditation is asserted, so the scheme and the
