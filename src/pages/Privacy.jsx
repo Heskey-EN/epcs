@@ -196,10 +196,15 @@ export default function Privacy() {
       <ul>
         <li>Enquiries that don’t become work — typically up to 12 months.</li>
         <li>Client, contract and financial records — as required for legal and tax purposes (generally 6 years).</li>
+        {/* 15 years, confirmed by George on 10 Sep 2026 — the retention his
+            accreditation scheme requires for audit evidence. It is a long time
+            to hold photographs of the inside of a home, which is exactly why
+            the period is stated plainly rather than left as "as required". */}
         <li>
-          Assessment photographs, site notes and survey data — for as long as our accreditation
-          scheme requires us to keep the evidence behind a certificate available for audit. We do
-          not keep them beyond that, and we do not use them for anything else.
+          Assessment photographs, site notes and survey data —{' '}
+          <strong>15 years</strong>. That is the period our accreditation scheme requires us to keep
+          the evidence behind a certificate available for audit. We hold it for that reason alone,
+          we do not use it for anything else, and we delete it at the end of that period.
         </li>
         <li>Analytics data — in line with Google Analytics’ retention settings.</li>
       </ul>
@@ -236,6 +241,17 @@ export default function Privacy() {
       <p>
         We use appropriate technical and organisational measures to protect your personal data
         against loss, misuse and unauthorised access.
+      </p>
+      {/* Says only what is actually true of the arrangement. The photograph
+          archive lives offline on our own storage, which is a real security
+          property worth stating — it cannot be reached from the website. It
+          deliberately does NOT claim the archive is encrypted; add that
+          sentence only once it is. */}
+      <p>
+        Your order details are held by Stripe and in our email, both reached over an encrypted
+        connection. Assessment photographs and site notes are kept offline on our own storage: they
+        are never uploaded to this website, never published, and are shared with nobody other than
+        our accreditation scheme if one of your certificates is audited.
       </p>
 
       <h2>Changes to this policy</h2>
