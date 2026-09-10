@@ -52,6 +52,21 @@ export default function Privacy() {
           <strong>Survey &amp; service data</strong> — if you go on to engage us, the information
           needed to carry out your survey, plan and any installation work.
         </li>
+        {/* Article 13: we cannot collect this and not say so. RdSAP 10 makes
+            photographic evidence mandatory and our accreditation scheme
+            requires the master images to be archived for audit, so this is
+            the most sensitive data the business holds — photographs of the
+            inside of someone's home, date- and location-stamped. */}
+        <li>
+          <strong>Assessment photographs and site notes</strong> — when we carry out an EPC at your
+          property: measurements, site notes and photographs of the things that determine the
+          rating, such as the boiler and its controls, meters, glazing, insulation, ventilation and
+          the outside of the building. The assessment standard requires these to be date-stamped
+          and location-stamped, and requires us to keep them so that an auditor can check the
+          certificate was produced correctly. We photograph the building, its fixtures and its
+          services — not you, and not your belongings. If you would rather a particular room or
+          item was not photographed, tell the assessor on the day.
+        </li>
         <li>
           <strong>Usage data</strong> — if you consent to analytics cookies, Google Analytics
           collects information about how you use the site (pages viewed, approximate location,
@@ -83,6 +98,17 @@ export default function Privacy() {
           <tr>
             <td>Deliver the surveys, plans and installations you engage us for</td>
             <td>Performance of a contract</td>
+          </tr>
+          <tr>
+            <td>
+              Take and keep assessment photographs and site notes, and produce and lodge your
+              certificate
+            </td>
+            <td>
+              Performance of a contract, and legal obligation — an EPC must be produced to the
+              government&rsquo;s assessment standard and lodged on the national register, and our
+              accreditation scheme must be able to audit it
+            </td>
           </tr>
           <tr>
             <td>Measure and improve the website (analytics)</td>
@@ -131,6 +157,19 @@ export default function Privacy() {
           you choose in the cookie banner. It cannot identify you.
         </li>
         <li>
+          <strong>{COMPANY.accreditationScheme}</strong> — our accreditation scheme. Your assessment
+          data, site notes and photographs are provided to them if your certificate is selected for
+          audit. Auditing is how the scheme checks that certificates are accurate, and every
+          assessor is subject to it.
+        </li>
+        <li>
+          <strong>The national register of energy certificates</strong> — your finished EPC is
+          lodged on the government&rsquo;s register, where it is published and can be found by
+          anyone searching your property&rsquo;s address. That is a legal requirement of producing
+          an EPC rather than something we choose to do. The photographs and site notes are{' '}
+          <strong>not</strong> published there.
+        </li>
+        <li>
           <strong>Accredited assessors, installers and scheme administrators</strong> — where needed
           to deliver a survey, plan or installation you have requested, or to process grant funding.
         </li>
@@ -157,6 +196,11 @@ export default function Privacy() {
       <ul>
         <li>Enquiries that don’t become work — typically up to 12 months.</li>
         <li>Client, contract and financial records — as required for legal and tax purposes (generally 6 years).</li>
+        <li>
+          Assessment photographs, site notes and survey data — for as long as our accreditation
+          scheme requires us to keep the evidence behind a certificate available for audit. We do
+          not keep them beyond that, and we do not use them for anything else.
+        </li>
         <li>Analytics data — in line with Google Analytics’ retention settings.</li>
       </ul>
       <p>We keep personal data only for as long as we need it for the purposes above.</p>
