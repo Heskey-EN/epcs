@@ -6,9 +6,10 @@
   "description": "Eco Futures — standalone domestic EPC booking page",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs && node scripts/ads-audit.mjs",
     "preview": "vite preview",
-    "build:client": "vite build"
+    "build:client": "vite build",
+    "audit": "node scripts/ads-audit.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

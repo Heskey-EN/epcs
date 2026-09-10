@@ -142,11 +142,38 @@ if (failures.length) {
 // Written here rather than kept in public/, because what it should say depends
 // on INDEXABLE and the host, and a stale hand-edited copy is how a site ends up
 // quietly blocking or quietly exposing itself.
+//
+// THE ADSBOT BLOCK IS NOT OPTIONAL. This site's whole purpose is to receive
+// Google Ads traffic, and Google must be able to fetch the landing page to
+// check the ad matches it — an uncrawlable destination is a disapproval.
+//
+// AdsBot deliberately ignores the wildcard `User-agent: *`, so `Disallow: /`
+// there does not actually block it. But relying on that is a trap: it means
+// the file SAYS "disallow everything" while the ads crawler quietly proceeds,
+// and anyone reading it later (including a reviewer looking at why an account
+// was flagged) sees a site that appears to be hiding itself. Naming AdsBot and
+// allowing it explicitly makes the intent legible and survives someone
+// tightening the wildcard rule later.
+//
+// Tokens per Google's crawler documentation: AdsBot-Google (desktop) and
+// AdsBot-Google-Mobile. AdsBot-Google-Mobile-Apps is retired.
+const ADSBOT = [
+  '# Google Ads checks the landing page before it will run an ad against it.',
+  '# AdsBot ignores the wildcard above, but this states the intent plainly:',
+  '# the ads crawler is welcome everywhere on this site.',
+  'User-agent: AdsBot-Google',
+  'Allow: /',
+  '',
+  'User-agent: AdsBot-Google-Mobile',
+  'Allow: /',
+  '',
+].join('\n')
+
 const robots = INDEXABLE
-  ? `User-agent: *\nAllow: /\nDisallow: /booked\n\nSitemap: ${SITE}/sitemap.xml\n`
-  : `# This deployment is a second copy of the booking page published at\n# ecofutures.uk/epcs. It exists to take paid traffic, which does not need\n# indexing, and two indexable copies of the same content compete with each\n# other. Set INDEXABLE=true in the environment to open it up.\nUser-agent: *\nDisallow: /\n`
+  ? `User-agent: *\nAllow: /\nDisallow: /booked\n\n${ADSBOT}\nSitemap: ${SITE}/sitemap.xml\n`
+  : `# This deployment is a second copy of the booking page published at\n# ecofutures.uk/epcs. It exists to take PAID traffic, which does not need\n# indexing, and two indexable copies of the same content compete with each\n# other in organic search. Set INDEXABLE=true in the environment to open it\n# up. Note this blocks the SEARCH crawler only — see the AdsBot block below.\nUser-agent: *\nDisallow: /\n\n${ADSBOT}`
 writeFileSync(join(dist, 'robots.txt'), robots)
-console.log(`robots:    ${INDEXABLE ? 'Allow: /' : 'Disallow: /'}`)
+console.log(`robots:    ${INDEXABLE ? 'Allow: /' : 'Disallow: / (search)'} · AdsBot allowed`)
 
 // ── sitemap.xml ────────────────────────────────────────────────────────────
 // Generated from the same route table that drives pre-rendering, so a new page
