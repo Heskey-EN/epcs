@@ -28,6 +28,18 @@ export default function Terms() {
         . By using this website you accept these terms. If you don’t agree with them, please don’t
         use the site.
       </p>
+      {/* Electronic Commerce (EC Directive) Regulations 2002, reg 6(f)–(g):
+          where the provider is subject to an authorisation or professional
+          scheme, the scheme and the registration number have to be given. */}
+      <p>
+        Energy Performance Certificates are produced by a domestic energy assessor accredited by{' '}
+        {COMPANY.accreditationScheme} under assessor number {COMPANY.assessorNumber}, and are
+        carried out and lodged in accordance with that scheme’s rules and the Energy Performance of
+        Buildings (England and Wales) Regulations 2012. You can contact us by email at{' '}
+        <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a> or by phone on{' '}
+        <a href={`tel:${COMPANY.phoneHref}`}>{COMPANY.phone}</a>.
+        {COMPANY.vatNumber ? <> Our VAT registration number is {COMPANY.vatNumber}.</> : null}
+      </p>
 
       <h2>Using the website</h2>
       <p>
@@ -43,11 +55,10 @@ export default function Terms() {
         your own use, but you may not reuse them commercially without our permission.
       </p>
 
-      <h2>Guidance, figures and the interactive tools are illustrative</h2>
+      <h2>Guidance and figures are illustrative</h2>
       <p>
-        The information on this site — including the interactive house explorer and any indicative
-        costs, savings, EPC uplifts, carbon figures and grant amounts — is provided for general
-        guidance only. The figures are typical estimates for older UK homes and are{' '}
+        The general information on this site — including any indicative costs, savings, EPC uplifts
+        and grant amounts — is provided for guidance only. The figures are typical estimates for older UK homes and are{' '}
         <strong>not quotes, guarantees, or a promise of any particular result</strong>. Every home
         is different. Actual measures, costs, savings and grant eligibility can only be confirmed by
         a survey of your specific property and by the relevant third parties and scheme rules.
@@ -63,7 +74,38 @@ export default function Terms() {
         details are provided with your quote.
       </p>
 
-      <h2>Payments &amp; memberships</h2>
+      {/* Electronic Commerce (EC Directive) Regulations 2002, reg 9: before an
+          order is placed a service provider must set out the technical steps
+          to conclude the contract, whether the contract will be filed and
+          accessible, how input errors can be corrected, and the languages
+          offered. Reg 9(3) also requires the terms to be available in a form
+          the customer can store and reproduce — which a plain web page the
+          browser can save or print satisfies. */}
+      <h2>How your order is made</h2>
+      <p>
+        You order an EPC by entering your house number or name, your postcode and the number of
+        bedrooms on our <a href="/">booking page</a>, ticking the box asking us to start within the
+        cancellation period, and then paying by card on Stripe’s secure checkout. The contract
+        between us is formed when your payment is confirmed and we send you an order confirmation by
+        email. Nothing is charged before then.
+      </p>
+      <p>
+        <strong>Correcting a mistake.</strong> Before you pay, you can change anything you have
+        entered by typing over it, and you can review the full price before pressing the pay button.
+        On Stripe’s checkout page you can go back to correct your details. If you spot a mistake
+        after paying — a wrong house number, the wrong number of bedrooms — call{' '}
+        <a href={`tel:${COMPANY.phoneHref}`}>{COMPANY.phone}</a> or email{' '}
+        <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a> and we will put it right. We will
+        not charge you for correcting an error before the visit.
+      </p>
+      <p>
+        <strong>Your records.</strong> We file your order and keep it for our records, and you can
+        ask us for a copy at any time. We do not publish it and it is not accessible to anyone else.
+        Your confirmation email is your own copy. These terms are on this page for you to save or
+        print at any time. The contract is concluded in English only.
+      </p>
+
+      <h2>Payments</h2>
       <p>
         Payments on this website are processed securely by Stripe; we don’t see or store your card
         details. Prices are in pounds sterling.
@@ -74,11 +116,6 @@ export default function Terms() {
         per additional bedroom, up to {EPC_MAX_BEDROOMS} bedrooms. There is no deposit and nothing
         further to pay. If we are unable to carry out your EPC (for example your property is outside
         our service area), we refund the fee in full.
-      </p>
-      <p>
-        <strong>Memberships.</strong> Software memberships (EPC Checker, Cavwall) are billed monthly
-        and renew automatically until cancelled. You can cancel at any time to stop future payments;
-        cancellation takes effect at the end of the current billing month.
       </p>
       <h2>Cancelling an EPC you booked online</h2>
       <p>
@@ -97,18 +134,34 @@ export default function Terms() {
           also use our <a href="/cancellation-form">cancellation form</a>.
         </li>
         <li>
-          If you ask us to carry out your EPC <strong>within</strong> those 14 days and then cancel
-          before it is done, you pay a proportionate amount for any work already carried out.
+          Because we aim to book you in within 24 hours, the booking form asks you to tick a box
+          expressly requesting that we start <strong>within</strong> those 14 days. If you then
+          cancel before the visit, you pay a proportionate amount for any work already carried out
+          and we refund the rest.
         </li>
         <li>
           Once the assessment has been carried out and the certificate lodged on the national
-          register, the service is fully performed and the right to cancel ends.
+          register, the service is fully performed and the right to cancel ends. That is what the
+          tick box confirms you understand.
         </li>
         <li>Refunds are made to the card you paid with, within 14 days of you telling us.</li>
       </ul>
       <p>
-        If you do not ask us to start within the 14 days, we will arrange your visit for after the
-        cancellation period ends.
+        If you would rather we did not start within the 14 days, do not tick the box — call us
+        instead and we will book your visit for after the cancellation period ends.
+      </p>
+
+      {/* Consumer Rights Act 2015 ss.49–52, and the Consumer Contracts
+          Regulations 2013 Sch 2(l), which requires a reminder that the trader
+          is under a legal duty to supply a conforming service. */}
+      <h2>Your legal rights</h2>
+      <p>
+        We are under a legal duty to supply services that conform to this contract. Under the
+        Consumer Rights Act 2015 any service we carry out for you must be performed with reasonable
+        care and skill, within a reasonable time, and must match anything we have told you about it
+        that you relied on. Nothing in these terms affects those rights. If a service we have
+        supplied does not meet that standard you are entitled to ask us to put it right, and to a
+        price reduction if we cannot.
       </p>
       <h2>Cancelling, rearranging or a missed visit</h2>
       <p>
@@ -127,6 +180,24 @@ export default function Terms() {
         PAS 2035 scheme), that scheme’s complaints and dispute-resolution process also applies, and
         we’ll tell you how to use it. A data-protection complaint can be raised separately with the
         ICO — see our <a href="/privacy">Privacy Policy</a>.
+      </p>
+      {/* Alternative Dispute Resolution for Consumer Disputes (Competent
+          Authorities and Information) Regulations 2015, reg 19, and the
+          Consumer Contracts Regulations 2013 Sch 2(t): where an internal
+          complaints procedure has been exhausted, a consumer must be told
+          about a competent ADR provider and whether the trader will use it.
+          We are not naming a scheme we have not joined — the duty bites at
+          the point the internal process is exhausted, which is what this
+          says. */}
+      <p>
+        <strong>If we cannot settle it between us.</strong> We aim to resolve every complaint
+        ourselves. If we have not been able to, and you are a consumer, you can ask for the dispute
+        to be looked at by an independent alternative dispute resolution (ADR) provider instead of
+        going to court. Where the work was done under TrustMark or a PAS 2035 scheme, that scheme’s
+        own dispute process applies and we will point you to it. Otherwise, write to us and we will
+        tell you within 14 days which ADR provider we consider competent to handle the dispute and
+        whether we agree to use them. Using ADR does not affect your right to take the matter to
+        court.
       </p>
 
       <h2>Third-party links</h2>

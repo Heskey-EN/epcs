@@ -63,6 +63,10 @@ const PRODUCTS = {
     dynamic: 'epc', // amount comes from epcPricePence(bedrooms)
     postcodeGated: true,
     collectJobDetails: true,
+    // We perform inside the 14-day cancellation window, so the customer's
+    // express request to start early is part of the order — see the check
+    // below and the tick box on the booking page.
+    requiresStartConsent: true,
     // After paying, the customer picks preferred dates on /booked. The session
     // id lets that page verify the payment and attach the dates to it.
     successTo: '/booked?session_id={CHECKOUT_SESSION_ID}',
@@ -123,12 +127,27 @@ export default async function handler(req, res) {
       body = {}
     }
   }
-  const { product, postcode, bedrooms, house } = body || {}
+  const { product, postcode, bedrooms, house, startNow } = body || {}
 
   // hasOwnProperty, not a bare lookup: `{"product":"constructor"}` finds an
   // inherited Object property and slips past a truthiness check.
   const cfg = Object.prototype.hasOwnProperty.call(PRODUCTS, product) ? PRODUCTS[product] : null
   if (!cfg) return res.status(400).json({ error: 'Unknown product.' })
+
+  /* Consumer Contracts Regulations 2013, regs 36(1) and 37(1). We aim to
+     book within 24 hours, so the EPC is always carried out inside the 14-day
+     cancellation period. Starting early lawfully requires the customer's
+     EXPRESS REQUEST, and the right to cancel only ends on full performance if
+     they also ACKNOWLEDGED that it would. The booking page captures both in
+     one tick; this is the same check server-side, because a crafted request
+     skips the page. Without it the certificate could be assessed, lodged and
+     paid for, and still cancelled for a full refund on day thirteen. */
+  if (cfg.requiresStartConsent && startNow !== true) {
+    return res.status(400).json({
+      error:
+        'Please confirm you are asking us to start within the 14-day cancellation period, so we can book you in straight away.',
+    })
+  }
 
   let coverage = null
   if (cfg.postcodeGated) {
@@ -212,6 +231,13 @@ export default async function handler(req, res) {
             }
           : {}),
         ...(beds ? { bedrooms: String(beds) } : {}),
+        /* The dated record that the customer asked us to start early and
+           accepted the consequence. Stripe timestamps the session itself, but
+           storing it explicitly means the evidence survives being read back
+           from the PaymentIntent alone. */
+        ...(cfg.requiresStartConsent
+          ? { early_start_requested_at: new Date().toISOString() }
+          : {}),
       },
     })
 

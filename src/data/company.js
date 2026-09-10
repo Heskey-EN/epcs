@@ -45,7 +45,7 @@ export const COMPANY = {
   lastUpdated: '17 July 2026', // fallback
   lastUpdatedPrivacy: '7 September 2026',
   lastUpdatedCookies: '7 September 2026',
-  lastUpdatedTerms: '17 July 2026',
+  lastUpdatedTerms: '10 September 2026',
 }
 
 // True while a field still holds its placeholder, so the UI can flag it.

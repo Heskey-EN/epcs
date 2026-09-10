@@ -130,6 +130,7 @@ export default function Book() {
   const [touched, setTouched] = useState(false)
   const [coverage, setCoverage] = useState({ state: 'idle', outcode: null })
   const [bedrooms, setBedrooms] = useState(3)
+  const [startNow, setStartNow] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -196,6 +197,18 @@ export default function Book() {
       setError('That does not look like a UK postcode. Please check it and try again.')
       return
     }
+    // Consumer Contracts Regulations 2013 regs 36 and 37. We book within 24
+    // hours, so the service is always performed INSIDE the 14-day cancellation
+    // window. Doing that lawfully needs the customer's express request; and
+    // the right to cancel only ends on full performance if they also
+    // acknowledged that it would. Without both, an EPC could be assessed,
+    // lodged and paid for, and still be cancelled for a full refund on day 13.
+    if (!startNow) {
+      setError(
+        'Please tick the box asking us to start within the 14-day cancellation period, so we can book you in straight away.',
+      )
+      return
+    }
     setLoading(true)
     // Wait for the coverage answer if it is still on its way.
     const cov =
@@ -209,7 +222,7 @@ export default function Book() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: 'epc', house, postcode, bedrooms }),
+        body: JSON.stringify({ product: 'epc', house, postcode, bedrooms, startNow }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok || !data.url) throw new Error(data.error || 'Something went wrong. Please try again.')
@@ -371,11 +384,44 @@ export default function Book() {
         </p>
       )}
 
+      {/* Consumer Contracts Regulations 2013, regs 36(1) and 37(1).
+          We aim to book within 24 hours, so the EPC is always carried out
+          INSIDE the 14-day cancellation window. Two things have to be true
+          for that to work: the customer must have EXPRESSLY REQUESTED that we
+          start early, and they must have ACKNOWLEDGED that the right to
+          cancel ends once the service is fully performed. Telling them is not
+          enough — the regulations want a positive act, which is what this tick
+          is. Without it the certificate could be assessed, lodged and paid
+          for, and still cancelled for a full refund on day thirteen.
+          The answer is sent to the server and stamped on the Stripe session,
+          so there is a dated record of it. */}
+      <label
+        htmlFor="start-now"
+        className="mt-5 flex cursor-pointer items-start gap-3 rounded-lg border border-line bg-paper p-3.5 text-xs leading-relaxed text-ink-soft transition-colors hover:border-green-300"
+      >
+        <input
+          id="start-now"
+          type="checkbox"
+          checked={startNow}
+          onChange={(e) => {
+            setStartNow(e.target.checked)
+            setError('')
+          }}
+          className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-line text-green-700 focus:ring-green-600"
+        />
+        <span>
+          <strong className="font-semibold text-ink">Please start straight away.</strong> I am asking
+          you to carry out my EPC within the 14-day cancellation period. If I cancel before the visit
+          I pay only for work already done, and I understand the right to cancel ends once my
+          certificate has been lodged.
+        </span>
+      </label>
+
       <button
         type="button"
         onClick={buy}
         disabled={loading}
-        className="btn-primary mt-5 w-full py-3.5 disabled:cursor-not-allowed disabled:opacity-60"
+        className="btn-primary mt-4 w-full py-3.5 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? (
           <>
