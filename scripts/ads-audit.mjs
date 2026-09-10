@@ -116,6 +116,17 @@ for (const [label, re] of Object.entries(identity)) {
   check(`Identity: ${label}`, re.test(homeText), re.test(homeText) ? 'on the landing page' : 'NOT FOUND', 'Misrepresentation — business identity')
 }
 
+/* 7b. …and stated ABOVE THE FOLD, not just somewhere in the footer. The
+   domain does not carry the business name, so a reviewer must be able to see
+   who is taking the money without scrolling. */
+const identityPos = homeText.indexOf('is the trading name of')
+check(
+  'Trading identity is stated near the top',
+  identityPos > -1 && identityPos < 1400,
+  identityPos < 0 ? 'NOT FOUND' : `${identityPos} characters in (footer-only would be several thousand)`,
+  'Misrepresentation — business identity',
+)
+
 /* 8. Price transparency. The full cost rule must be on the page, not just a
    "from" figure — Google disapproves landing pages that hide part of the cost,
    and it was one of the things we fixed on the main site. */

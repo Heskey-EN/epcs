@@ -73,6 +73,11 @@ const priceFor = (beds) =>
    courtesy to the customer, not the gate. */
 const CHECK_DELAY_MS = 350
 
+/* The domain this is actually served from, without the www. Derived rather
+   than hardcoded, so the identity line in the hero stays true if the site is
+   ever moved to a different domain. */
+const HOST = SITE.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/+$/, '')
+
 const facts = [
   {
     icon: FileCheck2,
@@ -523,7 +528,7 @@ export default function Book() {
       {/* ---- Hero + order card (the whole point of the page, above the fold) ---- */}
       <PageHeader
         image={IMAGES.headerEpcs.src}
-        kicker="Energy Performance Certificates"
+        kicker={`${HOST} · a booking site by Eco Futures`}
         title={
           <>
             Book a home EPC for <span className="text-green-400">£{EPC_BASE}</span>
@@ -548,7 +553,21 @@ export default function Book() {
             </li>
           ))}
         </ul>
-        <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/70">
+        {/* Who this actually is, above the fold.
+            The domain does not carry the business name, and a previously
+            flagged advertiser on a brand-new domain that does not match its
+            trading name invites exactly the misrepresentation review we are
+            trying to avoid. So the legal entity, its company number and its
+            registered office are stated in the hero rather than left to the
+            footer — a reviewer, or a customer, can identify who is taking the
+            money without scrolling. */}
+        <p className="mt-6 border-t border-white/15 pt-5 text-sm leading-relaxed text-white/75">
+          <strong className="font-semibold text-white">{HOST} is Eco Futures.</strong> Eco Futures is
+          the trading name of {COMPANY.legalName}, registered in {COMPANY.placeOfRegistration},
+          company number {COMPANY.companyNumber}, registered office {COMPANY.registeredOffice}.
+        </p>
+
+        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/70">
           <a className="inline-flex items-center gap-2 hover:text-white" href={`tel:${COMPANY.phoneHref}`}>
             <Phone size={15} /> {COMPANY.phone}
           </a>
