@@ -612,7 +612,7 @@ export default function Book() {
       )}
 
       {/* ---- How it works ---- */}
-      <section className="container-site py-16 md:py-20">
+      <section id="how" className="container-site scroll-mt-24 py-16 md:py-20">
         <div className="max-w-2xl">
           <h2 className="h-section">What happens next</h2>
           <p className="lede mt-4">Four steps, from payment to certificate.</p>
@@ -633,7 +633,7 @@ export default function Book() {
       {/* ---- What the price includes, and what it does not ----
            A shop or office landlord could otherwise pay and then need
            refunding under our own guarantee. ---- */}
-      <section className="border-y border-line bg-paper py-14 md:py-16">
+      <section id="included" className="border-y border-line bg-paper scroll-mt-24 py-14 md:py-16">
         <div className="container-site grid gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
             <h2 className="h-section">What the price includes</h2>
@@ -690,7 +690,7 @@ export default function Book() {
       </section>
 
       {/* ---- Where we work ---- */}
-      <section className="container-site py-16 md:py-20">
+      <section id="areas" className="container-site scroll-mt-24 py-16 md:py-20">
         <div className="max-w-2xl">
           <h2 className="h-section">Where we carry out EPCs</h2>
           <p className="lede mt-4">

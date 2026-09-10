@@ -204,6 +204,20 @@ for (const [label, path] of [
   check(`Linked from the landing page: ${label}`, linked, linked ? path : `no link to ${path}`, 'Data collection / consumer law')
 }
 
+/* 10b. Sitelink targets exist. A sitelink pointing at a section that has been
+   renamed or removed lands the visitor in the wrong place — and a sitelink to
+   a URL that 404s is a destination-requirements violation in its own right.
+   The five sitelinks inherited from the main site pointed at /retrofit,
+   /about and /software, none of which exist here. */
+const SITELINKS = ['order', 'how', 'included', 'areas']
+const missingAnchors = SITELINKS.filter((id) => !new RegExp(`id="${id}"`).test(home))
+check(
+  'Sitelink anchors exist on the page',
+  missingAnchors.length === 0,
+  missingAnchors.length ? `MISSING: #${missingAnchors.join(', #')}` : `#${SITELINKS.join(' #')}`,
+  'Destination requirements — destination not working',
+)
+
 /* 11. Nothing that auto-downloads or hijacks the visitor. */
 const nasties = {
   'auto-download link': /<a[^>]+download[^>]*>/i,
