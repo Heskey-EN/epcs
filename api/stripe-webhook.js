@@ -73,12 +73,23 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid signature' })
   }
 
-  if (event.type !== 'checkout.session.completed') {
-    return res.status(200).json({ received: true, handled: false })
+  /* Both events mean "this order is paid for", they just arrive at different
+     moments. A card settles immediately, so `completed` already carries
+     payment_status: paid. A delayed method — bank debit, bank transfer — sends
+     `completed` while still unpaid and then `async_payment_succeeded` once the
+     money actually lands. Handling only the first would mean a delayed payment
+     never produced an email at all. The payment_status check below is what
+     makes subscribing to both safe: whichever event arrives paid triggers the
+     notification, and the notified_at stamp stops the other one repeating it. */
+  const HANDLED = ['checkout.session.completed', 'checkout.session.async_payment_succeeded']
+  if (!HANDLED.includes(event.type)) {
+    return res.status(200).json({ received: true, handled: false, reason: 'ignored_event' })
   }
 
   const session = event.data.object
   if (session.payment_status !== 'paid') {
+    // Expected for a delayed payment method — its async_payment_succeeded will
+    // follow when the money clears, and that is the one that emails.
     return res.status(200).json({ received: true, handled: false, reason: 'unpaid' })
   }
 
