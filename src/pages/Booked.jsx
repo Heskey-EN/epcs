@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import emailjs from '@emailjs/browser'
 import {
   CheckCircle2,
   Loader2,
@@ -16,9 +15,6 @@ import { COMPANY } from '../data/company.js'
 import { trackPurchase } from '../lib/analytics.js'
 
 // Same EmailJS credentials the contact form uses — public client-side ids.
-const EMAILJS_SERVICE = import.meta.env.VITE_EMAILJS_SERVICE || 'service_tcu1ci3'
-const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE || 'template_ldu2ckm'
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'Ew-e7AM5p0vx0GqrC'
 
 const TIME_SLOTS = ['Morning', 'Afternoon', 'Either']
 
@@ -45,7 +41,6 @@ export default function Booked() {
   const [altDate, setAltDate] = useState('')
   const [timeSlot, setTimeSlot] = useState('Either')
   const [notes, setNotes] = useState('')
-  const emailedRef = useRef(false)
 
   // Earliest selectable day is tomorrow; latest a year out (matches the API).
   const { min, max } = useMemo(() => {
@@ -92,46 +87,12 @@ export default function Booked() {
   /* Notify George. Reuses the contact-form template (name/email/address/
      message), so there is no new EmailJS template to set up. Best-effort: a
      failure here must never tell a paying customer their booking failed. */
-  async function notify(details) {
-    if (emailedRef.current) return
-    emailedRef.current = true
-    const lines = [
-      'NEW EPC BOOKING — payment received',
-      '',
-      `Property:   ${details.propertyAddress || '(not given)'}`,
-      `Postcode:   ${details.postcode || '(not given)'}`,
-      `Bedrooms:   ${details.bedrooms || '?'}`,
-      `Paid:       £${details.amount ?? '?'}`,
-      '',
-      `Preferred:  ${details.preferredDate}`,
-      `Alternative:${details.altDate ? ` ${details.altDate}` : ' (none)'}`,
-      `Time:       ${details.timeSlot}`,
-      `Notes:      ${details.notes || '(none)'}`,
-      '',
-      `Customer:   ${details.name || '(not given)'}`,
-      `Phone:      ${details.phone || '(not given)'}`,
-      `Email:      ${details.email || '(not given)'}`,
-      '',
-      `Stripe ref: ${sessionId}`,
-    ]
-    try {
-      await emailjs.send(
-        EMAILJS_SERVICE,
-        EMAILJS_TEMPLATE,
-        {
-          name: `EPC booking — ${details.name || 'customer'}`,
-          email: details.email || COMPANY.email,
-          address: `${details.propertyAddress || ''} ${details.postcode || ''}`.trim(),
-          message: lines.join('\n'),
-        },
-        { publicKey: EMAILJS_PUBLIC_KEY },
-      )
-    } catch (e) {
-      // George still gets Stripe's own payment notification, and the dates are
-      // on the PaymentIntent — so this is a convenience, not the record.
-      console.error('Booking notification email failed:', e)
-    }
-  }
+  /* The booking notification is NOT sent from here.
+     It used to be: EmailJS, from the customer's browser, after they submitted
+     this form — which meant paying and closing the tab produced no email at
+     all. It now goes out server-side, from api/stripe-webhook.js the moment
+     Stripe confirms the payment, and again from api/booking.js when these
+     dates are saved. Neither depends on this page still being open. */
 
   async function submit(e) {
     e.preventDefault()
@@ -149,7 +110,6 @@ export default function Booked() {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || 'Could not save your dates.')
-      await notify({ ...order, preferredDate, altDate, timeSlot, notes })
       setOrder(data.order || { ...order, booked: true, preferredDate, altDate, timeSlot })
       setState('done')
     } catch (err) {

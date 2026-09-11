@@ -76,9 +76,38 @@ the same list.
 | `PUBLIC_SITE_URL`         | server      | The same value, for the serverless functions — they do not see the build-time injection. Set both.         |
 | `INDEXABLE`               | build       | `true` opens the site to search engines. **Unset means noindex** — see below.                              |
 | `STRIPE_SECRET_KEY`       | server      | `sk_live_…` / `sk_test_…`. Never reaches the browser.                                                      |
-| `VITE_EMAILJS_SERVICE`    | build       | EmailJS service id, for the booking notification sent from `/booked`.                                      |
-| `VITE_EMAILJS_TEMPLATE`   | build       | EmailJS template id.                                                                                       |
-| `VITE_EMAILJS_PUBLIC_KEY` | build       | EmailJS public key. Public by design.                                                                      |
+| `STRIPE_WEBHOOK_SECRET`   | server      | `whsec_…` from the Stripe webhook. Without it the webhook rejects every request.                           |
+| `RESEND_API_KEY`          | server      | `re_…` for the booking notification emails. Server-only — never prefix it `VITE_`.                          |
+| `BOOKINGS_EMAIL`          | server      | Where notifications go. Defaults to `COMPANY.email`.                                                        |
+| `BOOKINGS_FROM`           | server      | The `From:` address. Blank uses Resend's shared domain, which needs no DNS.                                 |
+
+### How you find out you have a booking
+
+Two emails per sale, both sent **server-side**, neither depending on the
+customer's browser:
+
+1. **`api/stripe-webhook.js`** — Stripe calls it on `checkout.session.completed`,
+   the instant the payment clears. Address, postcode, bedrooms, amount, name,
+   phone, email, distance from Preston. This one is guaranteed: it arrives
+   whether or not the customer stays on the page.
+2. **`api/booking.js`** — when they choose their preferred dates, you get those
+   too.
+
+This used to be EmailJS called from the customer's browser on `/booked`, which
+meant a customer who paid and closed the tab generated **no notification at
+all**. If you are ever tempted to move sending back to the client, that is why
+it is not there.
+
+Duplicate protection: Stripe redelivers events, so the webhook stamps
+`notified_at` on the PaymentIntent and skips any repeat. A retryable send
+failure returns 500 so Stripe tries again for up to three days; a
+misconfiguration returns 200 so the endpoint is not disabled over a missing key.
+
+**Setting up the Stripe webhook:** Stripe Dashboard → Developers → Webhooks →
+Add endpoint → `https://www.fastepcs.com/api/stripe-webhook`, event
+`checkout.session.completed`. Copy the signing secret into
+`STRIPE_WEBHOOK_SECRET` and redeploy — environment variables bind at build
+time, so a new variable does nothing until the next deploy.
 
 If `SITE_URL` is unset the build falls back to `VERCEL_PROJECT_PRODUCTION_URL`,
 which Vercel provides automatically, so a fresh deployment works before a domain

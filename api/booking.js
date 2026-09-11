@@ -14,6 +14,7 @@
 // Required env var: STRIPE_SECRET_KEY (already set for /api/checkout).
 import Stripe from 'stripe'
 import { COMPANY } from '../src/data/company.js'
+import { sendNotification, bookingLines } from './_notify.js'
 
 const MAX_NOTES = 500
 
@@ -147,7 +148,32 @@ export default async function handler(req, res) {
         }
       }
 
-      return res.status(200).json({ ok: true, order: summarise({ ...session, metadata: { ...session.metadata, ...metadata } }) })
+      const order = summarise({ ...session, metadata: { ...session.metadata, ...metadata } })
+
+      /* The second notification: which dates they want. Sent from here rather
+         than from the customer's browser, so it does not depend on their
+         connection surviving the round trip. Best-effort — the dates are
+         already safely on the PaymentIntent by this point, so a mail failure
+         must never turn into an error the customer sees after they have paid. */
+      try {
+        await sendNotification({
+          subject: `EPC dates chosen — ${order.propertyAddress || order.postcode || 'booking'}`,
+          lines: bookingLines(order, {
+            heading: 'EPC BOOKING — customer has chosen their dates',
+            sessionId: id,
+            dates: {
+              preferredDate: preferred,
+              altDate: alt,
+              timeSlot: slot,
+              notes: metadata.booking_notes,
+            },
+          }),
+        })
+      } catch (e) {
+        console.error('booking: date notification failed —', e?.message)
+      }
+
+      return res.status(200).json({ ok: true, order })
     } catch (e) {
       console.error('booking error:', e)
       return res.status(502).json({ error: 'Could not save your preferred dates. Please call us and we’ll book you in.' })
