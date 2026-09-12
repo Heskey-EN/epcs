@@ -72,6 +72,44 @@ const PRODUCTS = {
     successTo: '/booked?session_id={CHECKOUT_SESSION_ID}',
     cancelTo: '/?status=cancelled',
   },
+
+  /* A £1 product for proving the booking-notification path end to end.
+     Stripe will not let you fire a fake event at a LIVE webhook endpoint —
+     "send test webhook" is a test-mode feature — so the only way to know the
+     email really arrives is a real payment. £65 and a refund is a lot to pay
+     for that; £1 is not.
+
+     Three things keep it out of a customer's way:
+       · it only exists when TEST_CHECKOUT_ENABLED is exactly 'true', so it is
+         absent from the catalogue on a normal deploy
+       · nothing on the site ever posts this product name — the booking page
+         sends 'epc' and only 'epc'
+       · the metadata says TEST loudly, so the notification email cannot be
+         mistaken for a real booking that needs ringing back
+
+     Turn the variable on, run the test, turn it off. Leave it off. */
+  ...(process.env.TEST_CHECKOUT_ENABLED === 'true'
+    ? {
+        test: {
+          mode: 'payment',
+          name: 'TEST — booking notification check (£1)',
+          description: 'Not a real EPC. A £1 payment used to prove the booking email works.',
+          amount: 100,
+          collectJobDetails: true,
+          successTo: '/booked?session_id={CHECKOUT_SESSION_ID}',
+          cancelTo: '/?status=cancelled',
+          // Mirrors the shape a real order puts on the session, so the email
+          // that lands is structurally identical to a genuine one.
+          testMetadata: {
+            property_address: 'TEST — not a real booking',
+            postcode: 'PR1 2AB',
+            bedrooms: '3',
+            distance_miles: '0',
+            district: 'Preston / South Ribble',
+          },
+        },
+      }
+    : {}),
 }
 
 // Coverage is a 40-mile ring around Preston, decided by outcode distance:
@@ -238,6 +276,8 @@ export default async function handler(req, res) {
         ...(cfg.requiresStartConsent
           ? { early_start_requested_at: new Date().toISOString() }
           : {}),
+        // Only the £1 notification test carries this — see PRODUCTS.test.
+        ...(cfg.testMetadata || {}),
       },
     })
 
