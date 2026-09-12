@@ -82,6 +82,33 @@ check(
   'Destination requirements — crawlability',
 )
 
+/* 4b. Indexable — with the one deliberate exception.
+   The landing page must be open to search engines, and /booked must not be:
+   its URL carries a Stripe session id, which unlocks the payer's name, phone
+   and address. Getting either backwards is silent — the page looks identical
+   — so it is asserted here rather than trusted. */
+const landingNoindex = /<meta[^>]+name="robots"[^>]+noindex/i.test(home)
+const bookedHtml = read('booked/index.html') || ''
+const bookedNoindex = /<meta[^>]+name="robots"[^>]+noindex/i.test(bookedHtml)
+check(
+  'Landing page is indexable',
+  !landingNoindex,
+  landingNoindex ? 'NOINDEX on the page we want found' : 'no noindex',
+  'Discoverability',
+)
+check(
+  '/booked is NOT indexable',
+  bookedNoindex,
+  bookedNoindex ? 'noindex — its URL carries a Stripe session id' : 'MISSING noindex on a page with a session id in the URL',
+  'Data protection',
+)
+check(
+  'A sitemap was written',
+  existsSync(join(dist, 'sitemap.xml')),
+  existsSync(join(dist, 'sitemap.xml')) ? 'dist/sitemap.xml' : 'MISSING',
+  'Discoverability',
+)
+
 /* 5. No cloaking. The pre-rendered HTML a crawler reads must be the same page
    a visitor sees. Pre-rendering guarantees this by construction — the check is
    that the crawler is not being handed an empty shell. */

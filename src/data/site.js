@@ -21,13 +21,21 @@ export const url = (path = '/') => `${SITE}${path === '/' ? '' : path}`
 
 // Whether this deployment should be indexed by search engines.
 //
-// Default is NO. This site is a copy of the booking page that already exists at
-// ecofutures.uk/epcs, and two indexable copies of the same content compete with
-// each other: the established domain would lose ground to a new one with no
-// authority, which is the opposite of what a hedge deployment is for. It exists
-// to receive paid traffic, which does not require indexing.
+// Default is YES, since 2026-09-12. It was NO while this was a hedge deployment
+// standing behind ecofutures.uk/epcs — two indexable copies of one page compete,
+// and the established domain would have lost ground to a new one with no
+// authority. That is no longer the situation: this is the primary site, it is
+// where the ads point, and it is the only one being worked on. A commercial site
+// that refuses to be found in organic search is leaving free traffic on the
+// table for no remaining reason.
 //
-// Set INDEXABLE=true in the environment only if this domain becomes the primary
-// home for the booking page and ecofutures.uk/epcs is removed or canonicalised
-// to it.
-export const INDEXABLE = String(import.meta.env.VITE_INDEXABLE || '') === 'true'
+// /booked stays out of the index either way — its URL carries a Stripe session
+// id, which unlocks the payer's name, phone and address. That exclusion lives in
+// scripts/prerender.mjs, not here.
+//
+// Set INDEXABLE=false in the environment to close it again — useful for a
+// staging deployment, which should never be indexed.
+export const INDEXABLE =
+  !['false', '0', 'no', 'off'].includes(
+    String(import.meta.env.VITE_INDEXABLE ?? '').trim().toLowerCase(),
+  )

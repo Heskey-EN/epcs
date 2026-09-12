@@ -37,11 +37,16 @@ const SITE = (() => {
   return 'http://localhost:5173'
 })()
 
-// Whether search engines may index this deployment. Default NO — see
-// src/data/site.js for the reasoning. In short: this is a second copy of the
-// booking page that already exists at ecofutures.uk/epcs, and letting the two
-// compete in organic search costs the established domain for nothing.
-const INDEXABLE = String(process.env.INDEXABLE || '') === 'true'
+// Whether search engines may index this deployment. Default YES — see
+// src/data/site.js. This is the primary site now, and a commercial page that
+// refuses to be found in organic search is turning down free traffic. Set
+// INDEXABLE=false to close it again, which a staging deployment should.
+//
+// Kept in step with src/data/site.js by hand: this file runs in Node at build
+// time and cannot import the browser module's import.meta.env.
+const INDEXABLE = !['false', '0', 'no', 'off'].includes(
+  String(process.env.INDEXABLE ?? '').trim().toLowerCase(),
+)
 
 const { render, ROUTE_META, metaFor } = await import(pathToFileURL(ssrEntry).href)
 
@@ -171,7 +176,7 @@ const ADSBOT = [
 
 const robots = INDEXABLE
   ? `User-agent: *\nAllow: /\nDisallow: /booked\n\n${ADSBOT}\nSitemap: ${SITE}/sitemap.xml\n`
-  : `# This deployment is a second copy of the booking page published at\n# ecofutures.uk/epcs. It exists to take PAID traffic, which does not need\n# indexing, and two indexable copies of the same content compete with each\n# other in organic search. Set INDEXABLE=true in the environment to open it\n# up. Note this blocks the SEARCH crawler only — see the AdsBot block below.\nUser-agent: *\nDisallow: /\n\n${ADSBOT}`
+  : `# Closed to search engines because INDEXABLE is set to false. That is the\n# right setting for a staging deployment and the wrong one for production —\n# see src/data/site.js. Note this blocks the SEARCH crawler only; the ads\n# crawler is still welcome, see the AdsBot block below.\nUser-agent: *\nDisallow: /\n\n${ADSBOT}`
 writeFileSync(join(dist, 'robots.txt'), robots)
 console.log(`robots:    ${INDEXABLE ? 'Allow: /' : 'Disallow: / (search)'} · AdsBot allowed`)
 
