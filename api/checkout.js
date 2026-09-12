@@ -48,6 +48,12 @@ export function epcPricePence(bedrooms) {
   return { bedrooms: n, amount: EPC_BASE_PENCE + extra * EPC_PER_EXTRA_BEDROOM_PENCE }
 }
 
+/* An environment variable typed into a dashboard is typed by a human, so a
+   strict === 'true' rejects "True", "TRUE", "1" and a stray trailing space
+   without saying why. Anything that plainly means yes counts as on; anything
+   absent, blank or unrecognised counts as off. */
+const isOn = (v) => ['true', '1', 'yes', 'on'].includes(String(v ?? '').trim().toLowerCase())
+
 // Product catalogue. Amounts are in pence. Edit here to change prices.
 //
 // This deployment sells one thing. The parent site's other products (the EPC
@@ -80,7 +86,7 @@ const PRODUCTS = {
      for that; £1 is not.
 
      Three things keep it out of a customer's way:
-       · it only exists when TEST_CHECKOUT_ENABLED is exactly 'true', so it is
+       · it only exists when TEST_CHECKOUT_ENABLED is switched on, so it is
          absent from the catalogue on a normal deploy
        · nothing on the site ever posts this product name — the booking page
          sends 'epc' and only 'epc'
@@ -88,7 +94,7 @@ const PRODUCTS = {
          mistaken for a real booking that needs ringing back
 
      Turn the variable on, run the test, turn it off. Leave it off. */
-  ...(process.env.TEST_CHECKOUT_ENABLED === 'true'
+  ...(isOn(process.env.TEST_CHECKOUT_ENABLED)
     ? {
         test: {
           mode: 'payment',
