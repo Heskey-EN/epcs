@@ -48,11 +48,14 @@ const INDEXABLE = !['false', '0', 'no', 'off'].includes(
   String(process.env.INDEXABLE ?? '').trim().toLowerCase(),
 )
 
-const { render, ROUTE_META, metaFor } = await import(pathToFileURL(ssrEntry).href)
+const { render, ROUTE_META, metaFor, BLOG_POSTS = [] } = await import(pathToFileURL(ssrEntry).href)
 
 const template = readFileSync(join(dist, 'index.html'), 'utf8')
 
-const routes = Object.keys(ROUTE_META)
+// The fixed pages, then the blog: its index and one page per post
+// (content/blog/*.md, compiled by scripts/build-blog.mjs).
+const postByPath = new Map(BLOG_POSTS.map((p) => [p.path, p]))
+const routes = [...Object.keys(ROUTE_META), '/blog', ...postByPath.keys()]
 
 // Pages that must never be indexed even when the site as a whole is: /booked
 // carries a Stripe session id in its URL, which unlocks the payer's name,
@@ -91,6 +94,26 @@ for (const route of routes) {
       )
 
     html = html.replace('</head>', `  <link rel="canonical" href="${url(route)}" />\n  </head>`)
+    html = html.replace(
+      /<meta\s+property="og:type"[\s\S]*?\/>/,
+      `<meta property="og:url" content="${url(route)}" />\n    <meta property="og:type" content="${postByPath.has(route) ? 'article' : 'website'}" />`,
+    )
+
+    // Blog pages advertise the feed; posts carry their dates for social cards.
+    if (route === '/blog' || postByPath.has(route)) {
+      html = html.replace(
+        '</head>',
+        `  <link rel="alternate" type="application/rss+xml" title="Eco Futures EPC news" href="${SITE}/blog/rss.xml" />\n  </head>`,
+      )
+    }
+    const post = postByPath.get(route)
+    if (post) {
+      html = html.replace(
+        '</head>',
+        `  <meta property="article:published_time" content="${post.publishedAt}" />\n` +
+          `  <meta property="article:modified_time" content="${post.modifiedAt}" />\n  </head>`,
+      )
+    }
 
     if (!INDEXABLE || NOINDEX.has(route)) {
       html = html.replace('</head>', '  <meta name="robots" content="noindex, nofollow" />\n  </head>')
@@ -186,8 +209,16 @@ console.log(`robots:    ${INDEXABLE ? 'Allow: /' : 'Disallow: / (search)'} · Ad
 // publishing a sitemap for a site that says Disallow is a contradiction.
 if (INDEXABLE) {
   const EXCLUDE = new Set(['/booked'])
-  const priorityFor = (u) => (u === '/' ? '1.0' : '0.4')
+  const priorityFor = (u) => (u === '/' ? '1.0' : u === '/blog' ? '0.6' : postByPath.has(u) ? '0.5' : '0.4')
   const today = new Date().toISOString().slice(0, 10)
+  // A post's lastmod is the day it was last really changed, never the build
+  // date — Google ignores lastmod on sites that bump it on every deploy.
+  const lastmodFor = (u) => {
+    const p = postByPath.get(u)
+    if (p) return p.updated || p.date
+    if (u === '/blog' && BLOG_POSTS.length) return BLOG_POSTS[0].updated || BLOG_POSTS[0].date
+    return today
+  }
   const sitemapUrls = routes.filter((u) => !EXCLUDE.has(u))
 
   const sitemap =
@@ -198,7 +229,7 @@ if (INDEXABLE) {
         (u) =>
           '  <url>\n' +
           `    <loc>${url(u)}</loc>\n` +
-          `    <lastmod>${today}</lastmod>\n` +
+          `    <lastmod>${lastmodFor(u)}</lastmod>\n` +
           `    <priority>${priorityFor(u)}</priority>\n` +
           '  </url>\n',
       )
@@ -207,4 +238,40 @@ if (INDEXABLE) {
 
   writeFileSync(join(dist, 'sitemap.xml'), sitemap)
   console.log(`sitemap:   ${sitemapUrls.length} urls`)
+}
+
+// ── blog/rss.xml ───────────────────────────────────────────────────────────
+// The newest 50 posts. Feed readers and some aggregators discover new posts
+// from this faster than from the sitemap.
+{
+  const esc = (s) =>
+    String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  const items = BLOG_POSTS.slice(0, 50)
+    .map(
+      (p) =>
+        '    <item>\n' +
+        `      <title>${esc(p.title)}</title>\n` +
+        `      <link>${url(p.path)}</link>\n` +
+        `      <guid isPermaLink="true">${url(p.path)}</guid>\n` +
+        `      <pubDate>${new Date(p.publishedAt).toUTCString()}</pubDate>\n` +
+        `      <category>${esc(p.categoryLabel)}</category>\n` +
+        `      <description>${esc(p.description)}</description>\n` +
+        '    </item>\n',
+    )
+    .join('')
+  const rss =
+    '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n' +
+    '  <channel>\n' +
+    '    <title>Eco Futures EPC news</title>\n' +
+    `    <link>${url('/blog')}</link>\n` +
+    `    <atom:link href="${url('/blog/rss.xml')}" rel="self" type="application/rss+xml" />\n` +
+    '    <description>EPC rules, landlord deadlines and energy grant news for Preston, Blackpool and the North West.</description>\n' +
+    '    <language>en-gb</language>\n' +
+    items +
+    '  </channel>\n' +
+    '</rss>\n'
+  mkdirSync(join(dist, 'blog'), { recursive: true })
+  writeFileSync(join(dist, 'blog', 'rss.xml'), rss)
+  console.log(`rss:       ${Math.min(BLOG_POSTS.length, 50)} item(s)`)
 }

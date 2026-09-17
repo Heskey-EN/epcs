@@ -256,6 +256,55 @@ export const faqNode = ({ path, questions }) => ({
   })),
 })
 
+/* ── Blog ──────────────────────────────────────────────────────────────── */
+
+export const BLOG_ID = `${SITE}/blog#blog`
+
+/** The blog as a whole, published by the organisation. */
+export const blogNode = () => ({
+  '@type': 'Blog',
+  '@id': BLOG_ID,
+  url: `${SITE}/blog`,
+  name: `${COMPANY.tradingName} EPC news`,
+  description:
+    'EPC rules, landlord deadlines and energy grant news for Preston, Blackpool and the North West.',
+  publisher: { '@id': ID.organization },
+  isPartOf: { '@id': ID.website },
+  inLanguage: 'en-GB',
+})
+
+/**
+ * One post. The byline is the organisation — that is what the page shows, and
+ * Google requires the author markup to match the visible byline. Every source
+ * the post cites is listed as a `citation`, mirroring the Sources list on the
+ * page.
+ */
+export const blogPostingNode = (post) => ({
+  '@type': 'BlogPosting',
+  '@id': `${SITE}${post.path}#article`,
+  headline: post.title,
+  description: post.description,
+  url: `${SITE}${post.path}`,
+  mainEntityOfPage: { '@id': `${SITE}${post.path}#webpage` },
+  isPartOf: { '@id': BLOG_ID },
+  datePublished: post.publishedAt,
+  dateModified: post.modifiedAt,
+  author: { '@id': ID.organization },
+  publisher: { '@id': ID.organization },
+  image: `${SITE}/brand/eco-futures-logo.png`,
+  articleSection: post.categoryLabel,
+  ...(post.keywords?.length ? { keywords: post.keywords.join(', ') } : {}),
+  wordCount: post.words,
+  inLanguage: 'en-GB',
+  citation: post.sources.map((s) => ({
+    '@type': 'CreativeWork',
+    name: s.title,
+    url: s.url,
+    publisher: { '@type': 'Organization', name: s.publisher },
+    ...(s.date ? { datePublished: s.date } : {}),
+  })),
+})
+
 /** Wrap nodes into the single @graph document a page emits. */
 export const graph = (...nodes) => ({
   '@context': 'https://schema.org',

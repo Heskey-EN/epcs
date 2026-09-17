@@ -8,6 +8,8 @@ import Privacy from './pages/Privacy.jsx'
 import Cookies from './pages/Cookies.jsx'
 import Terms from './pages/Terms.jsx'
 import NotFound from './pages/NotFound.jsx'
+import BlogIndex from './pages/BlogIndex.jsx'
+import BlogPost from './pages/BlogPost.jsx'
 
 /**
  * One job: sell and book a domestic EPC.
@@ -17,6 +19,9 @@ import NotFound from './pages/NotFound.jsx'
  * the documents a business is required to publish before taking money online:
  * the cancellation form under the Consumer Contracts Regulations, and the
  * privacy, cookie and terms pages.
+ *
+ * The blog (/blog) is the one addition that is not part of the sale: EPC news
+ * and guides that earn organic search traffic. Posts live in content/blog/*.md.
  */
 export default function App() {
   return (
@@ -31,6 +36,8 @@ export default function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/cookies" element={<Cookies />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/blog" element={<BlogIndex />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

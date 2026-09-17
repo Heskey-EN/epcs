@@ -7,6 +7,10 @@
 //
 // This deployment sells one thing, so the booking page is the site root rather
 // than living at /epcs.
+//
+// Blog pages are not listed here: their titles come from the posts themselves
+// (content/blog/*.md), looked up by blogMetaFor() in src/lib/blog.js.
+import { blogMetaFor } from '../lib/blog.js'
 
 export const DEFAULT_META = {
   title: 'Book a Home EPC for £65 | Eco Futures',
@@ -44,4 +48,4 @@ export const ROUTE_META = {
   },
 }
 
-export const metaFor = (pathname) => ROUTE_META[pathname] || DEFAULT_META
+export const metaFor = (pathname) => ROUTE_META[pathname] || blogMetaFor(pathname) || DEFAULT_META

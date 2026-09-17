@@ -160,6 +160,43 @@
   .prose-legal strong {
     @apply font-semibold text-ink;
   }
+  /* Blog article body — the legal prose rules plus what articles use. */
+  .prose-blog {
+    @apply text-[1.05rem] leading-[1.75] text-ink-soft;
+  }
+  .prose-blog h2 {
+    @apply mb-3 mt-10 font-display text-2xl font-medium text-ink first:mt-0;
+  }
+  .prose-blog h3 {
+    @apply mb-2 mt-7 font-display text-lg font-medium text-ink;
+  }
+  .prose-blog p {
+    @apply my-4;
+  }
+  .prose-blog ul {
+    @apply my-4 list-disc space-y-2 pl-5;
+  }
+  .prose-blog ol {
+    @apply my-4 list-decimal space-y-2 pl-5;
+  }
+  .prose-blog a {
+    @apply font-medium text-green-700 underline underline-offset-2 hover:text-green-800;
+  }
+  .prose-blog strong {
+    @apply font-semibold text-ink;
+  }
+  .prose-blog blockquote {
+    @apply my-6 border-l-4 border-green-300 pl-5 italic text-ink;
+  }
+  .prose-blog table {
+    @apply my-6 w-full border-collapse text-sm;
+  }
+  .prose-blog th {
+    @apply border border-line bg-paper px-3 py-2 text-left align-top font-semibold text-ink;
+  }
+  .prose-blog td {
+    @apply border border-line px-3 py-2 align-top;
+  }
   .prose-legal button {
     @apply no-underline;
   }

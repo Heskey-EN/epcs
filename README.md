@@ -31,8 +31,27 @@ in **both** repositories.
 | `/privacy`          | Privacy policy.                                                    |
 | `/cookies`          | Cookie policy.                                                     |
 | `/terms`            | Terms of use.                                                      |
+| `/blog`             | EPC news and guides — see **Blog** below.                          |
+| `/blog/<slug>`      | One post, compiled from `content/blog/<slug>.md`.                   |
 
 Anything else returns a real `404`.
+
+## Blog
+
+Posts are Markdown files in `content/blog/`, compiled by `scripts/build-blog.mjs`
+(the first step of `npm run build`) into `src/generated/` (gitignored). Each post
+is pre-rendered to `dist/blog/<slug>/index.html`, added to the sitemap with its
+real date, listed in `dist/blog/rss.xml`, and carries `BlogPosting` structured
+data with its sources as citations.
+
+Posts are split into their own lazy chunks, so none of the blog lands in the
+booking page's bundle (the ads audit now measures what `/` actually loads). The
+compile step **fails the build** on a post with no source, a future date, a
+missing summary or an over-long description — posts are published by a
+scheduled task, and this is the editor.
+
+How posts are researched, written and published, and the SEO strategy behind
+them: `docs/blog/PLAYBOOK.md`. Ideas queue: `docs/blog/TOPIC-BACKLOG.md`.
 
 ## Getting it running
 

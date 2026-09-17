@@ -13,6 +13,17 @@ import { StrictMode } from 'react'
 import { renderToString } from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom/server'
 import App from './App.jsx'
+import { primeBlog } from './lib/blog.js'
+
+// Every post, loaded synchronously: renderToString cannot wait for the lazy
+// chunks the browser uses. This eager glob exists only in the SSR bundle.
+const postModules = import.meta.glob('./generated/posts/*.json', { eager: true, import: 'default' })
+const BLOG_POSTS = Object.values(postModules).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
+import BLOG_INDEX from './generated/blog-index.json'
+primeBlog(BLOG_INDEX, BLOG_POSTS)
+
+/** Full post objects, newest first — prerender.mjs writes pages, the sitemap and RSS from these. */
+export { BLOG_POSTS }
 
 /** Render one route to an HTML string. */
 export function render(url) {

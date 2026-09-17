@@ -9,7 +9,7 @@
 // It reads dist/ — the actual files Vercel will serve — rather than the source,
 // because every fault that caused the original problem was a build or hosting
 // behaviour, not a line of JSX.
-import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync, existsSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 const dist = join(process.cwd(), 'dist')
@@ -274,14 +274,25 @@ const thinMeta = routes.filter((r) => {
 })
 check('Every route has a real title and description', thinMeta.length === 0, thinMeta.length ? `thin: ${thinMeta.join(', ')}` : 'all routes', 'Destination requirements')
 
-/* 14. Nothing enormous that would make the page feel broken on mobile data. */
-const bytes = (d) =>
-  readdirSync(d, { withFileTypes: true }).reduce(
-    (n, e) => n + (e.isDirectory() ? bytes(join(d, e.name)) : statSync(join(d, e.name)).size),
-    0,
-  )
-const assetKb = Math.round(bytes(join(dist, 'assets')) / 1024)
-check('Bundle is a sensible size', assetKb < 1024, `${assetKb} KB of JS and CSS`, 'Destination requirements — user experience')
+/* 14. Nothing enormous that would make the page feel broken on mobile data.
+   Measured as what the LANDING PAGE actually loads — the entry script, its
+   preloaded chunks and the stylesheet named in dist/index.html. It used to
+   sum all of dist/assets, which stopped meaning anything once the blog
+   arrived: every post is its own lazy chunk, fetched only by someone reading
+   that post, and a year of posts would have "failed" a page that never
+   downloads them. */
+const entryAssets = [...home.matchAll(/(?:src|href)="\/(assets\/[^"]+\.(?:js|css))"/g)].map((m) => m[1])
+const entryBytes = [...new Set(entryAssets)].reduce(
+  (n, p) => n + (existsSync(join(dist, p)) ? statSync(join(dist, p)).size : 0),
+  0,
+)
+const assetKb = Math.round(entryBytes / 1024)
+check(
+  'Landing page bundle is a sensible size',
+  entryAssets.length > 0 && assetKb < 1024,
+  `${assetKb} KB of JS and CSS loaded by / (${new Set(entryAssets).size} files)`,
+  'Destination requirements — user experience',
+)
 
 /* ── report ─────────────────────────────────────────────────────────────── */
 const failed = results.filter((r) => !r.pass)

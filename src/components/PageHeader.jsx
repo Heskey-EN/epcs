@@ -16,6 +16,8 @@ export default function PageHeader({
   aside,
   image,
   compact = false,
+  // Long titles (blog posts) pass a smaller heading style than the default.
+  titleClassName = 'h-page',
 }) {
   return (
     <section
@@ -57,7 +59,7 @@ export default function PageHeader({
             </nav>
           )}
           {kicker && <p className="kicker mb-4 text-green-400">{kicker}</p>}
-          <h1 id="page-title" className="h-page">
+          <h1 id="page-title" className={titleClassName}>
             {title}
           </h1>
           {intro && (

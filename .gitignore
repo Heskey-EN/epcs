@@ -9,3 +9,5 @@ dist-ssr
 .DS_Store
 npm-debug.log*
 .claude/
+# Compiled from content/blog by scripts/build-blog.mjs
+src/generated/

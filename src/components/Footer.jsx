@@ -10,9 +10,9 @@ const GOV_EPC_SEARCH =
   'https://find-energy-certificate.service.gov.uk/find-a-certificate/search-by-postcode?lang=en&property_type=domestic'
 const GOV_ADVICE = 'https://www.gov.uk/improve-energy-efficiency'
 
-// Outbound only. There is no site map to print here — this deployment is the
-// booking page plus the documents the law requires beside it, and those are in
-// the legal strip below.
+// Outbound links, plus the one internal section that is not a legal document:
+// the blog. Linking it from the footer of every page is what lets crawlers
+// (and visitors) find new posts without adding navigation to the header.
 const usefulLinks = [
   { label: 'Find an existing EPC', href: GOV_EPC_SEARCH },
   { label: 'Government energy advice', href: GOV_ADVICE },
@@ -104,6 +104,11 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-green-400">Useful links</h3>
             <ul className="mt-5 space-y-3 text-[0.95rem] text-white/75">
+              <li>
+                <Link to="/blog" className="inline-flex items-center gap-1 transition-colors hover:text-white">
+                  EPC news &amp; landlord updates
+                </Link>
+              </li>
               {usefulLinks.map((l) => (
                 <li key={l.label}>
                   <a
